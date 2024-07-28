@@ -3,24 +3,45 @@
         <div class="slds-card__body slds-card__body_inner">
             <form>
                 <div class="slds-form-element slds-var-m-bottom_medium">
-                    <label for="first-name">First Name</label>
-                    <input type="text" name="first-name">
+                    <lightning-input
+                        type="text"
+                        label="First Name"
+                        value={firstName}
+                        onchange={handleFirstNameChange}>
+                    </lightning-input>
+                    <lightning-input
+                        type="text"
+                        label="Last Name"
+                        value={lastName}
+                        onchange={handleLastNameChange}>
+                    </lightning-input>
+                    <lightning-input
+                        type="email"
+                        label="Email"
+                        value={email}
+                        onchange={handleEmailChange}>
+                    </lightning-input>
                 </div>
-                <label for="last-name">Last Name</label>
-                <input type="text" name="last-name">
                 <button type="button" class="slds-button slds-button_brand" onclick={getBreedsHandler}>Get Breeds</button>
-                <lightning-button
+                <lightning-button lwc:if={selectedRows.length}
                     class="slds-float_right"
                     label="Assign"
                     title="Assign"
                     onclick={handleAssign}>
                 </lightning-button>
             </form>
+            <div>
+                <lightning-flow lwc:if={renderFlow}
+                    hidden=true,
+                    flow-api-name="Assign_Dog_Facts_Create_Records_From_LWC"
+                    flow-input-variables={inputVariables}>
+                </lightning-flow>
+            </div>
         </div>
-        <div>
+        <div class="slds-var-p-around_x-small">
             <lightning-datatable
                 lwc:if={data.length}
-                key-field="id"
+                key-field="breedName"
                 data={data}
                 columns={columns}
                 onrowselection={handleRowSelection}

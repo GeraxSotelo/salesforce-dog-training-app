@@ -2,23 +2,28 @@ import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const COLUMNS = [
-    {label: 'Breed Name', fieldName: 'breedName', type: 'text', sortable: true},
-    {label: 'Minimum Life', fieldName: 'lifeMin', type: 'number',
+    {label: 'Breed Name', fieldName: 'Breed_Name__c', type: 'text', sortable: true},
+    {label: 'Minimum Life', fieldName: 'Minimum_Life__c', type: 'number',
         cellAttributes: { alignment: 'left' }},
-    {label: 'Maximum Life', fieldName: 'lifeMax', type: 'number',
+    {label: 'Maximum Life', fieldName: 'Maximum_Life__c', type: 'number',
         cellAttributes: { alignment: 'left' }},
-    {label: 'Description', fieldName: 'description', type: 'text'},
-    {label: 'Hypoallergenic', fieldName: 'hypoallergenic', type: 'boolean'}
+    {label: 'Description', fieldName: 'Description__c', type: 'text'},
+    {label: 'Hypoallergenic', fieldName: 'Hypoallergenic__c', type: 'boolean'}
 
 ]
 
 export default class AssignDogFacts extends LightningElement {
     data = [];
     columns = COLUMNS;
+    firstName = '';
+    lastName = '';
+    email = '';
     selectedRows = [];
     defaultSortDirection = 'asc';
     sortDirection = 'asc';
     sortedBy;
+    inputVariables = [];
+    renderFlow = false;
 
     getBreedsHandler() {
         const API_URL = 'https://dogapi.dog/api/v2/breeds';
@@ -33,19 +38,29 @@ export default class AssignDogFacts extends LightningElement {
 
     processData(info) {
         const processedData = info.map(item => ({
-            id: item.id,
-            breedName: item.attributes.name,
-            description: item.attributes.description,
-            lifeMax: item.attributes.life.max,
-            lifeMin: item.attributes.life.min,
-            hypoallergenic: item.attributes.hypoallergenic,
+            Breed_Name__c: item.attributes.name,
+            Description__c: item.attributes.description,
+            Maximum_Life__c: item.attributes.life.max,
+            Minimum_Life__c: item.attributes.life.min,
+            Hypoallergenic__c: item.attributes.hypoallergenic,
         }));
         return processedData;
     }
 
     handleRowSelection(event) {
         this.selectedRows = [...event.detail.selectedRows];
-        console.log('selectedRows: ', JSON.stringify(this.selectedRows));
+    }
+
+    handleFirstNameChange(event) {
+        this.firstName = event.target.value;
+    }
+
+    handleLastNameChange(event) {
+        this.lastName = event.target.value;
+    }
+
+    handleEmailChange(event) {
+        this.email = event.target.value;
     }
 
     handleAssign() {
@@ -55,6 +70,15 @@ export default class AssignDogFacts extends LightningElement {
                 message: 'Please select at least one breed',
                 variant: 'error'
             }));
+        } else {
+                this.inputVariables = [
+                    {
+                        name: 'assignDogFactsCollection',
+                        type: 'SObject',
+                        value: this.selectedRows
+                    }
+                ];
+            this.renderFlow = true;
         }
     }
 
