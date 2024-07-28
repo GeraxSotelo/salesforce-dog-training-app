@@ -8,8 +8,27 @@
                 </div>
                 <label for="last-name">Last Name</label>
                 <input type="text" name="last-name">
+                <button type="button" class="slds-button slds-button_brand" onclick={getBreedsHandler}>Get Breeds</button>
+                <lightning-button
+                    class="slds-float_right"
+                    label="Assign"
+                    title="Assign"
+                    onclick={handleAssign}>
+                </lightning-button>
             </form>
-            <button class="slds-button slds-button_neutral" onclick={getBreedsHandler}>Get Breeds</button>
+        </div>
+        <div>
+            <lightning-datatable
+                lwc:if={data.length}
+                key-field="id"
+                data={data}
+                columns={columns}
+                onrowselection={handleRowSelection}
+                default-sort-direction={defaultSortDirection}
+                sorted-direction={sortDirection}
+                sorted-by={sortedBy}
+                onsort={onHandleSort}>
+            </lightning-datatable>
         </div>
     </div>
 </template>
