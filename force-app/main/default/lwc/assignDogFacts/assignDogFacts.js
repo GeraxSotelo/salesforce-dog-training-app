@@ -1,28 +1,13 @@
 import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-const COLUMNS = [
-    {label: 'Breed Name', fieldName: 'breedName', type: 'text', sortable: true},
-    {label: 'Minimum Life', fieldName: 'lifeMin', type: 'number',
-        cellAttributes: { alignment: 'left' }},
-    {label: 'Maximum Life', fieldName: 'lifeMax', type: 'number',
-        cellAttributes: { alignment: 'left' }},
-    {label: 'Description', fieldName: 'description', type: 'text'},
-    {label: 'Hypoallergenic', fieldName: 'hypoallergenic', type: 'boolean'}
-
-]
-
 export default class AssignDogFacts extends LightningElement {
     data = [];
-    columns = COLUMNS;
     firstName = '';
     lastName = '';
     email = '';
     selectedRows = [];
     records = [];
-    defaultSortDirection = 'asc';
-    sortDirection = 'asc';
-    sortedBy;
     inputVariables = [];
     renderFlow = false;
 
@@ -48,7 +33,7 @@ export default class AssignDogFacts extends LightningElement {
     }
 
     handleRowSelection(event) {
-        this.selectedRows = [...event.detail.selectedRows];
+        this.selectedRows = event.detail;
     }
 
     handleFirstNameChange(event) {
@@ -85,8 +70,7 @@ export default class AssignDogFacts extends LightningElement {
     }
 
     createRecordData(data) {
-        const fullName = `${this.firstName} ${this.lastName}`
-        console.log('Full Name: ' , fullName);
+        const fullName = `${this.firstName} ${this.lastName}`;
         this.records = data.map(item => ({ 
             Name: fullName.trim().length === 0  ? item.breedName : `${fullName.trim()} - ${item.breedName}`,
             Assigned_To__c: fullName,
@@ -103,7 +87,7 @@ export default class AssignDogFacts extends LightningElement {
         if (event.detail.status === "FINISHED_SCREEN") {
             this.dispatchEvent( new ShowToastEvent({
                 title: 'Success',
-                message: 'Dog breed facts have been assigned',
+                message: 'Breed facts have been assigned',
                 variant: 'success'
             }));
             this.renderFlow = false;
@@ -112,34 +96,6 @@ export default class AssignDogFacts extends LightningElement {
 
     handleClearForm() {
         this.selectedRows = [];
-        this.template.querySelector('lightning-datatable').selectedRows = [];
-    }
-
-
-    // Used to sort the 'Breed Name' column
-    sortBy(field, reverse, primer) {
-        const key = primer
-            ? function (x) {
-                  return primer(x[field]);
-              }
-            : function (x) {
-                  return x[field];
-              };
-
-        return function (a, b) {
-            a = key(a);
-            b = key(b);
-            return reverse * ((a > b) - (b > a));
-        };
-    }
-
-    onHandleSort(event) {
-        const { fieldName: sortedBy, sortDirection } = event.detail;
-        const cloneData = [...this.data];
-
-        cloneData.sort(this.sortBy(sortedBy, sortDirection === 'asc' ? 1 : -1));
-        this.data = cloneData;
-        this.sortDirection = sortDirection;
-        this.sortedBy = sortedBy;
+        this.template.querySelector('c-breed-data-table').handleClearSelections();
     }
 }

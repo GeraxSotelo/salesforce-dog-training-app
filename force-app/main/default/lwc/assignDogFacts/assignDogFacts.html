@@ -57,17 +57,10 @@
             </div>
         </div>
         <div class="slds-var-p-around_x-small">
-            <lightning-datatable
-                lwc:if={data.length}
-                key-field="breedName"
-                data={data}
-                columns={columns}
-                onrowselection={handleRowSelection}
-                default-sort-direction={defaultSortDirection}
-                sorted-direction={sortDirection}
-                sorted-by={sortedBy}
-                onsort={onHandleSort}>
-            </lightning-datatable>
+            <c-breed-data-table lwc:if={data.length}
+                breed-data={data}
+                onrowselected={handleRowSelection}>
+            </c-breed-data-table>
         </div>
     </div>
 </template>

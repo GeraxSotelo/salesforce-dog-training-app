@@ -1,0 +1,18 @@
+<template>
+    <div class="slds-form-element">
+        <div class="slds-var-p-around_x-small">
+            <lightning-datatable
+                lwc:if={breedData.length}
+                key-field="breedName"
+                data={breedData}
+                columns={columns}
+                onrowselection={handleRowSelection}
+                wrap-text-max-lines="2"
+                default-sort-direction={defaultSortDirection}
+                sorted-direction={sortDirection}
+                sorted-by={sortedBy}
+                onsort={onHandleSort}>
+            </lightning-datatable>
+        </div>
+    </div>
+</template>
