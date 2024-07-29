@@ -1,18 +1,20 @@
 <template>
     <div class="breed-card">
         <div class="slds-card__body slds-card__body_inner">
-            <form>
+            <form onsubmit={handleAssignDogFacts}>
                 <div class="slds-form-element slds-var-m-bottom_medium">
                     <lightning-input
                         type="text"
                         label="First Name"
                         value={firstName}
+                        required
                         onchange={handleFirstNameChange}>
                     </lightning-input>
                     <lightning-input
                         type="text"
                         label="Last Name"
                         value={lastName}
+                        required
                         onchange={handleLastNameChange}>
                     </lightning-input>
                     <lightning-input
@@ -22,19 +24,35 @@
                         onchange={handleEmailChange}>
                     </lightning-input>
                 </div>
-                <button type="button" class="slds-button slds-button_brand" onclick={getBreedsHandler}>Get Breeds</button>
-                <lightning-button lwc:if={selectedRows.length}
+                <lightning-button
+                    variant="brand-outline"
+                    label="Get Breeds"
+                    title="Get Breeds"
+                    onclick={getBreedsHandler}
+                    type="button">
+                </lightning-button>
+                <lightning-button
+                    class="slds-m-left_x-small"
+                    variant="destructive-text"
+                    label="Clear Form"
+                    title="Clear Form"
+                    onclick={handleClearForm}
+                    type="reset">
+                </lightning-button>
+                <lightning-button
                     class="slds-float_right"
+                    variant="brand"
                     label="Assign"
                     title="Assign"
-                    onclick={handleAssign}>
+                    type="submit">
                 </lightning-button>
             </form>
             <div>
                 <lightning-flow lwc:if={renderFlow}
-                    hidden=true,
+                    hidden
                     flow-api-name="Assign_Dog_Facts_Create_Records_From_LWC"
-                    flow-input-variables={inputVariables}>
+                    flow-input-variables={inputVariables}
+                    onstatuschange={handleStatusChange} >
                 </lightning-flow>
             </div>
         </div>

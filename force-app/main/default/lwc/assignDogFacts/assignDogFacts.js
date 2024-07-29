@@ -2,13 +2,13 @@ import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const COLUMNS = [
-    {label: 'Breed Name', fieldName: 'Breed_Name__c', type: 'text', sortable: true},
-    {label: 'Minimum Life', fieldName: 'Minimum_Life__c', type: 'number',
+    {label: 'Breed Name', fieldName: 'breedName', type: 'text', sortable: true},
+    {label: 'Minimum Life', fieldName: 'lifeMin', type: 'number',
         cellAttributes: { alignment: 'left' }},
-    {label: 'Maximum Life', fieldName: 'Maximum_Life__c', type: 'number',
+    {label: 'Maximum Life', fieldName: 'lifeMax', type: 'number',
         cellAttributes: { alignment: 'left' }},
-    {label: 'Description', fieldName: 'Description__c', type: 'text'},
-    {label: 'Hypoallergenic', fieldName: 'Hypoallergenic__c', type: 'boolean'}
+    {label: 'Description', fieldName: 'description', type: 'text'},
+    {label: 'Hypoallergenic', fieldName: 'hypoallergenic', type: 'boolean'}
 
 ]
 
@@ -19,6 +19,7 @@ export default class AssignDogFacts extends LightningElement {
     lastName = '';
     email = '';
     selectedRows = [];
+    records = [];
     defaultSortDirection = 'asc';
     sortDirection = 'asc';
     sortedBy;
@@ -30,19 +31,18 @@ export default class AssignDogFacts extends LightningElement {
 
         fetch(API_URL).then(res => res.json()).then(result => {
             this.data = this.processData(result.data);
-
         }).catch(error => {
             console.log('Error: ', error);
         })
     }
 
-    processData(info) {
-        const processedData = info.map(item => ({
-            Breed_Name__c: item.attributes.name,
-            Description__c: item.attributes.description,
-            Maximum_Life__c: item.attributes.life.max,
-            Minimum_Life__c: item.attributes.life.min,
-            Hypoallergenic__c: item.attributes.hypoallergenic,
+    processData(data) {
+        const processedData = data.map(item => ({
+            breedName: item.attributes.name,
+            description: item.attributes.description,
+            lifeMax: item.attributes.life.max,
+            lifeMin: item.attributes.life.min,
+            hypoallergenic: item.attributes.hypoallergenic
         }));
         return processedData;
     }
@@ -63,7 +63,8 @@ export default class AssignDogFacts extends LightningElement {
         this.email = event.target.value;
     }
 
-    handleAssign() {
+    handleAssignDogFacts(event) {
+        event.preventDefault();
         if (this.selectedRows.length === 0) {
             this.dispatchEvent( new ShowToastEvent({
                 title: 'Error',
@@ -71,15 +72,47 @@ export default class AssignDogFacts extends LightningElement {
                 variant: 'error'
             }));
         } else {
-                this.inputVariables = [
-                    {
-                        name: 'assignDogFactsCollection',
-                        type: 'SObject',
-                        value: this.selectedRows
-                    }
-                ];
+            this.createRecordData(this.selectedRows);
+            this.inputVariables = [
+                {
+                    name: 'assignDogFactsCollection',
+                    type: 'SObject',
+                    value: this.records
+                }
+            ];
             this.renderFlow = true;
         }
+    }
+
+    createRecordData(data) {
+        const fullName = `${this.firstName} ${this.lastName}`
+        console.log('Full Name: ' , fullName);
+        this.records = data.map(item => ({ 
+            Name: fullName.trim().length === 0  ? item.breedName : `${fullName.trim()} - ${item.breedName}`,
+            Assigned_To__c: fullName,
+            Email__c: this.email,
+            Breed_Name__c: item.breedName,
+            Description__c: item.description,
+            Maximum_Life__c: item.lifeMax,
+            Minimum_Life__c: item.lifeMin,
+            Hypoallergenic__c: item.hypoallergenic
+        }))
+    }
+
+    handleStatusChange(event) {
+        if (event.detail.status === "FINISHED_SCREEN") {
+            this.dispatchEvent( new ShowToastEvent({
+                title: 'Success',
+                message: 'Dog breed facts have been assigned',
+                variant: 'success'
+            }));
+            this.renderFlow = false;
+        }
+    }
+
+    handleClearForm() {
+        this.selectedRows = [];
+        this.template.querySelector('lightning-datatable').selectedRows = [];
     }
 
 
